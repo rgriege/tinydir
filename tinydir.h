@@ -107,14 +107,6 @@ extern "C" {
 #define _TINYDIR_DRIVE_MAX 3
 #endif
 
-#ifdef _MSC_VER
-# define _TINYDIR_FUNC static __inline
-#elif !defined __STDC_VERSION__ || __STDC_VERSION__ < 199901L
-# define _TINYDIR_FUNC static __inline__
-#else
-# define _TINYDIR_FUNC static inline
-#endif
-
 /* readdir_r usage; define TINYDIR_USE_READDIR_R to use it (if supported) */
 #ifdef TINYDIR_USE_READDIR_R
 
@@ -212,31 +204,20 @@ typedef struct tinydir_dir
 
 /* declarations */
 
-_TINYDIR_FUNC
 int tinydir_open(tinydir_dir *dir, const _tinydir_char_t *path);
-_TINYDIR_FUNC
 int tinydir_open_sorted(tinydir_dir *dir, const _tinydir_char_t *path);
-_TINYDIR_FUNC
 void tinydir_close(tinydir_dir *dir);
 
-_TINYDIR_FUNC
 int tinydir_next(tinydir_dir *dir);
-_TINYDIR_FUNC
 int tinydir_readfile(const tinydir_dir *dir, tinydir_file *file);
-_TINYDIR_FUNC
 int tinydir_readfile_n(const tinydir_dir *dir, tinydir_file *file, size_t i);
-_TINYDIR_FUNC
 int tinydir_open_subdir_n(tinydir_dir *dir, size_t i);
 
-_TINYDIR_FUNC
 int tinydir_file_open(tinydir_file *file, const _tinydir_char_t *path);
-_TINYDIR_FUNC
 void _tinydir_get_ext(tinydir_file *file);
-_TINYDIR_FUNC
 int _tinydir_file_cmp(const void *a, const void *b);
 #ifndef _MSC_VER
 #ifndef _TINYDIR_USE_READDIR
-_TINYDIR_FUNC
 size_t _tinydir_dirent_buf_size(_TINYDIR_DIR *dirp);
 #endif
 #endif
@@ -244,7 +225,8 @@ size_t _tinydir_dirent_buf_size(_TINYDIR_DIR *dirp);
 
 /* definitions*/
 
-_TINYDIR_FUNC
+#ifdef TINYDIR_IMPLEMENTATION
+
 int tinydir_open(tinydir_dir *dir, const _tinydir_char_t *path)
 {
 #ifndef _MSC_VER
@@ -331,7 +313,6 @@ bail:
 	return -1;
 }
 
-_TINYDIR_FUNC
 int tinydir_open_sorted(tinydir_dir *dir, const _tinydir_char_t *path)
 {
 	/* Count the number of files first, to pre-allocate the files array */
@@ -394,7 +375,6 @@ bail:
 	return -1;
 }
 
-_TINYDIR_FUNC
 void tinydir_close(tinydir_dir *dir)
 {
 	if (dir == NULL)
@@ -427,7 +407,6 @@ void tinydir_close(tinydir_dir *dir)
 #endif
 }
 
-_TINYDIR_FUNC
 int tinydir_next(tinydir_dir *dir)
 {
 	if (dir == NULL)
@@ -474,7 +453,6 @@ int tinydir_next(tinydir_dir *dir)
 	return 0;
 }
 
-_TINYDIR_FUNC
 int tinydir_readfile(const tinydir_dir *dir, tinydir_file *file)
 {
 	if (dir == NULL || file == NULL)
@@ -568,7 +546,6 @@ int tinydir_readfile(const tinydir_dir *dir, tinydir_file *file)
 	return 0;
 }
 
-_TINYDIR_FUNC
 int tinydir_readfile_n(const tinydir_dir *dir, tinydir_file *file, size_t i)
 {
 	if (dir == NULL || file == NULL)
@@ -588,7 +565,6 @@ int tinydir_readfile_n(const tinydir_dir *dir, tinydir_file *file, size_t i)
 	return 0;
 }
 
-_TINYDIR_FUNC
 int tinydir_open_subdir_n(tinydir_dir *dir, size_t i)
 {
 	_tinydir_char_t path[_TINYDIR_PATH_MAX];
@@ -614,7 +590,6 @@ int tinydir_open_subdir_n(tinydir_dir *dir, size_t i)
 }
 
 /* Open a single file given its path */
-_TINYDIR_FUNC
 int tinydir_file_open(tinydir_file *file, const _tinydir_char_t *path)
 {
 	tinydir_dir dir;
@@ -723,7 +698,6 @@ bail:
 	return result;
 }
 
-_TINYDIR_FUNC
 void _tinydir_get_ext(tinydir_file *file)
 {
 	_tinydir_char_t *period = _tinydir_strrchr(file->name, TINYDIR_STRING('.'));
@@ -737,7 +711,6 @@ void _tinydir_get_ext(tinydir_file *file)
 	}
 }
 
-_TINYDIR_FUNC
 int _tinydir_file_cmp(const void *a, const void *b)
 {
 	const tinydir_file *fa = (const tinydir_file *)a;
@@ -762,7 +735,6 @@ from https://womble.decadent.org.uk/readdir_r-advisory.html
 * This code does not trust values of NAME_MAX that are less than    *
 * 255, since some systems (including at least HP-UX) incorrectly    *
 * define it to be a smaller value.                                  */
-_TINYDIR_FUNC
 size_t _tinydir_dirent_buf_size(_TINYDIR_DIR *dirp)
 {
 	long name_max;
@@ -789,6 +761,8 @@ size_t _tinydir_dirent_buf_size(_TINYDIR_DIR *dirp)
 }
 #endif
 #endif
+
+#endif // TINYDIR_IMPLEMENTATION
 
 #ifdef __cplusplus
 }
