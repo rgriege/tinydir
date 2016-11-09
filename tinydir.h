@@ -48,6 +48,7 @@ extern "C" {
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
 # include <tchar.h>
+# include <sys/stat.h>
 # pragma warning(push)
 # pragma warning (disable : 4996)
 #else
@@ -173,12 +174,10 @@ typedef struct tinydir_file
 	int is_dir;
 	int is_reg;
 
-#ifndef _MSC_VER
-#ifdef __MINGW32__
+#ifdef _WIN32
 	struct _stat _s;
 #else
 	struct stat _s;
-#endif
 #endif
 } tinydir_file;
 
@@ -505,8 +504,7 @@ int tinydir_readfile(const tinydir_dir *dir, tinydir_file *file)
 #endif
 	);
 	_tinydir_strcat(file->path, file->name);
-#ifndef _MSC_VER
-#ifdef __MINGW32__
+#ifdef _WIN32
 	if (_tstat(
 #else
 	if (stat(
@@ -515,7 +513,6 @@ int tinydir_readfile(const tinydir_dir *dir, tinydir_file *file)
 	{
 		return -1;
 	}
-#endif
 	_tinydir_get_ext(file);
 
 	file->is_dir =
